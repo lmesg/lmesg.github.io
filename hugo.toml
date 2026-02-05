@@ -1,6 +1,6 @@
 baseURL = "https://lmesg.github.io/"
 languageCode = "ko-kr"
-title = "lmesg  Security Log"
+title = "lmesg Security Log"
 theme = "PaperMod"
 
 [params]
