@@ -33,13 +33,13 @@ draft: false
 	- 문자열을 출력하고 개행 추가
 
 위의 개념들을 가지고 어떤 취약점을 가지고있는지 실습을 통해 알아보자
-1. [[C언어 기초 함수의 취약점(Overflow, Buffer remnant) 이해#gets()를 이용한 Stack Buffer Overflow 실습|gets()를 이용한 Stack Buffer Overflow 실습]]
-2. [[C언어 기초 함수의 취약점(Overflow, Buffer remnant) 이해#scanf()와 %s의 위험성 실습|scanf()와 %s의 위험성 실습]]
-3. [[C언어 기초 함수의 취약점(Overflow, Buffer remnant) 이해#getchar()와 입력 Buffer 찌꺼기 활용 공격 실습|getchar()와 입력 Buffer 찌꺼기 활용 공격 실습]]
-4. [[C언어 기초 함수의 취약점(Overflow, Buffer remnant) 이해#printf() Format String 맛보기 실습|printf() Format String 맛보기 실습]]
+1. **gets()를 이용한 Stack Buffer Overflow 실습**
+2. **scanf()와 %s의 위험성 실습**
+3. **getchar()와 입력 Buffer 찌꺼기 활용 공격 실습**
+4. **printf() Format String 맛보기 실습**
 
 
-#### gets()를 이용한 Stack Buffer Overflow 실습
+### gets()를 이용한 Stack Buffer Overflow 실습
 가장 클래식한 취약점 실습이다. `gets()`가 왜 **금지된 함수**인지 확인해보자.
 - **실습 방법:** `char buf[5];`와 같이 아주 작은 배열을 선언하고 `gets(buf);`로 입력을 받는다.
 - **공격 시도:** 5글자가 아니라 `AAAAAAAAAAAA...`처럼 아주 긴 문자열을 입력해 본다.
@@ -72,7 +72,7 @@ int main() {
 - **보완점:** `fgets(buf, sizeof(buf), stdin);`
 - **이유:** `fgets()`는 사용자가 아무리 길게 입력해도 정해진 `sizeof(buf)` 만큼만 읽으므로, 옆 칸인 `admin_pw`를 절대 침범할 수 없음.
 
-#### scanf()와 %s의 위험성 실습
+### scanf()와 %s의 위험성 실습
 `scanf()`는 형식을 지정하니까 안전하다고 오해하지만 `%s`는 `gets()`와 마찬가지로 입력 길이를 제한하지 않는다.
 - **실습 방법:** `char name[10];`을 선언하고 `scanf("%s", name);`으로 입력을 받는다.
 - **공격 시도:** 10글자가 아니라 `1234567890ABCDEFG`처럼 배열 크기를 초과하는 긴 문자열을 입력한다.
@@ -100,7 +100,7 @@ int main() {
 - **보완점:** `scanf("%9s", name);`처럼 숫자를 명시하여 읽어올 길이를 강제로 제한해야 함.
 - **이유**: null을 제외한 9개 까지의 문자를 저장하므로 Stack Buffer Overflow를 방지 할 수 있음.
 
-#### getchar()와 입력 Buffer 찌꺼기 활용 공격 실습
+### getchar()와 입력 Buffer 찌꺼기 활용 공격 실습
 메모리 파괴가 아닌 프로그램의 **논리적 흐름**을 비틀어 인증이나 절차를 우회하는 기법이다.
 - **실습 방법:** `getchar()`로 첫 글자(`Y/N`)를 받고, 곧바로 아래에서 `scanf()`로 비밀번호를 입력받는다.
 - **공격 시도:** 첫 번째 입력 시 `Y`만 치지 않고 `Y1234`처럼 뒤에 데이터를 붙여서 입력한 후 엔터를 누른다.
@@ -132,7 +132,7 @@ int main() {
 - **보완점**: while문을 사용한 입력버퍼를 초기화하거나 getchar()또는 scanf() 대신 fgets() 사용
 - **이유:** 입력 버퍼 초기화가 누락되면 사용자의 의도와 다른 데이터가 변수에 주입될 수 있음.
 
-#### printf() Format String 맛보기 실습
+### printf() Format String 맛보기 실습
 데이터가 출력되어야 할 위치에 공격자의 명령(서식 지정자)이 끼어들어 **시스템 내부 정보를 유출**하는 공격입니다.
 - **실습 방법:** `char user_input[100];`에 입력을 받고, `printf(user_input);`과 같이 서식 지정자 없이 변수를 직접 출력한다.
 - **공격 시도:** 입력창에 `%p %p %p %p`와 같은 서식 지정자를 입력해 본다(%p는 포인터 주소값 출력서식 지정자).
